@@ -82,12 +82,6 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
-        - name: redis-config
-          configMap:
-            name: {{ include "redis.fullname" . }}-config
-            items:
-              - key: redis.conf
-                path: redis.conf
         - name: redis-data
           {{- if .Values.storage.useEmptyDir }}
           emptyDir: {}

@@ -12,6 +12,3 @@ resources:
   limits:
     cpu: 500m
     memory: 1Gi
-config:
-  maxmemory: "512mb"
-  maxmemory-policy: "allkeys-lru"
