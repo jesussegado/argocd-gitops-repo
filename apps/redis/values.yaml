@@ -6,65 +6,59 @@ image:
   tag: "7.4.1"
   pullPolicy: IfNotPresent
 
-replicaCount: 1
-
 serviceAccount:
   create: true
   automount: true
+  annotations: {}
   name: ""
-  annotations: {}
-
-service:
-  type: ClusterIP
-  port: 6379
-  annotations: {}
 
 podAnnotations: {}
 podLabels: {}
 
-resources:
-  requests:
-    cpu: 50m
-    memory: 128Mi
-  limits:
-    cpu: 250m
-    memory: 512Mi
+podSecurityContext: {}
 
-nodeSelector: {}
+securityContext: {}
+
+autoscaling:
+  enabled: false
+
+volumes: []
+
+volumeMounts: []
+
 tolerations: []
+
 affinity: {}
 
-# Simple in-pod storage (no PVC). Change to an existing claim if needed.
-storage:
-  useEmptyDir: true
-  existingClaim: ""  # set to a PVC name to use it (Deployment supports only one claim via volumes)
-
-auth:
+reloader:
   enabled: false
-  # If enabled, either provide an existing secret with key "redis-password"
-  existingSecret: ""
-  # Or let the chart create a Secret from this value (recommended to override with --set or values-*.yaml)
-  password: ""
 
-# redis.conf content. You can add more directives as needed.
-config:
-  appendonly: "yes"
-  save: "900 1 300 10 60 10000"
-  tcp-keepalive: "300"
-  maxmemory: ""        # e.g. "256mb"
-  maxmemory-policy: "" # e.g. "allkeys-lru"
-  additionalConfig: [] # list of extra lines, e.g. ["io-threads 2", "io-threads-do-reads yes"]
-
-livenessProbe:
-  enabled: true
-  initialDelaySeconds: 10
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 6
-
+startupProbe:
+  enabled: false
+  
 readinessProbe:
-  enabled: true
-  initialDelaySeconds: 5
-  periodSeconds: 5
-  timeoutSeconds: 3
-  failureThreshold: 6
+  enabled: false
+
+imagePullSecrets: 
+  enable: false
+ 
+livenessProbe:
+  enabled: false
+  
+ingress:
+  enabled: false
+  classname: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+nodeSelector:
+  oke.oraclecloud.com/pool.name: np-general
+
+resources:
+  limits:
+    cpu: 4 
+    memory: 8Gi
+  requests:
+    cpu: 1
+    memory: 2Gi
