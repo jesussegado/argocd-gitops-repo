@@ -57,8 +57,6 @@ spec:
             - name: redis
               containerPort: 6379
           volumeMounts:
-            - name: redis-config
-              mountPath: /etc/redis
             - name: redis-data
               mountPath: /data
           {{- if .Values.livenessProbe.enabled }}
