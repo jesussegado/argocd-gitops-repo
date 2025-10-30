@@ -6,6 +6,11 @@ image:
   tag: "7.4.1"
   pullPolicy: IfNotPresent
 
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8081
+
 serviceAccount:
   create: true
   automount: true
