@@ -1,0 +1,71 @@
+
+
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 1
+
+image:
+  repository: rediscommander/redis-commander
+  tag: latest
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+autoscaling:
+  enabled: false
+
+volumes: []
+
+volumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+reloader:
+  enabled: false
+
+startupProbe:
+  enabled: false
+  
+readinessProbe:
+  enabled: false
+
+imagePullSecrets: 
+  enable: false
+ 
+livenessProbe:
+  enabled: false
+  
+ingress:
+  enabled: false
+  classname: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+
+nodeSelector:
+  oke.oraclecloud.com/pool.name: np-general
+
+resources:
+  limits:
+    cpu: 4 
+    memory: 8Gi
+  requests:
+    cpu: 1
+    memory: 2Gi

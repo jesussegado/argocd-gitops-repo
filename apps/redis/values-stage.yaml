@@ -1,0 +1,14 @@
+replicaCount: 1
+auth:
+  enabled: true
+  password: "stage-redis-pass-change-me"
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 512Mi
+config:
+  maxmemory: "256mb"
+  maxmemory-policy: "allkeys-lru"

@@ -1,0 +1,11 @@
+
+reloader:
+  enabled: true
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8081
+
+environment:
+  REDIS_HOSTS: "local:redis-master.redis.svc.cluster.local:6379"

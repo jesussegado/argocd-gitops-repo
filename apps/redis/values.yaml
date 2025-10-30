@@ -1,0 +1,69 @@
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: redis
+  tag: "7.4.1"
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+service:
+  type: ClusterIP
+  port: 6379
+  annotations: {}
+
+podAnnotations: {}
+podLabels: {}
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 512Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Simple in-pod storage (no PVC). Change to an existing claim if needed.
+storage:
+  useEmptyDir: true
+  existingClaim: ""  # set to a PVC name to use it (Deployment supports only one claim via volumes)
+
+auth:
+  enabled: false
+  # If enabled, either provide an existing secret with key "redis-password"
+  existingSecret: ""
+  # Or let the chart create a Secret from this value (recommended to override with --set or values-*.yaml)
+  password: ""
+
+# redis.conf content. You can add more directives as needed.
+config:
+  appendonly: "yes"
+  save: "900 1 300 10 60 10000"
+  tcp-keepalive: "300"
+  maxmemory: ""        # e.g. "256mb"
+  maxmemory-policy: "" # e.g. "allkeys-lru"
+  additionalConfig: [] # list of extra lines, e.g. ["io-threads 2", "io-threads-do-reads yes"]
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 6

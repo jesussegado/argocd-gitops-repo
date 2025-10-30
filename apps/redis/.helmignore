@@ -1,0 +1,9 @@
+# Common Helm ignores
+.DS_Store
+.git/
+.gitignore
+*.swp
+*.tmp
+*.bak
+*.log
+charts/

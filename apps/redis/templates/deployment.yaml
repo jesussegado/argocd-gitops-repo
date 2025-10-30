@@ -1,0 +1,111 @@
+{{- /*
+     Optional Secret for auth. If auth.enabled and no existingSecret is set,
+     we create one holding key "redis-password".
+*/ -}}
+{{- if and .Values.auth.enabled (not .Values.auth.existingSecret) }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "redis.fullname" . }}-auth
+  labels:
+    {{- include "redis.labels" . | nindent 4 }}
+type: Opaque
+stringData:
+  redis-password: {{ required "When auth.enabled=true and no existingSecret is set, you must provide .Values.auth.password" .Values.auth.password | quote }}
+---
+{{- end }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "redis.fullname" . }}
+  labels:
+    {{- include "redis.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "redis.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "redis.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}{{- toYaml . | nindent 8 }}{{- end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{- if .Values.serviceAccount.create -}}{{ default (include "redis.fullname" .) .Values.serviceAccount.name }}{{- else -}}{{ default "default" .Values.serviceAccount.name }}{{- end }}
+      containers:
+        - name: redis
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["redis-server", "/etc/redis/redis.conf"]
+          {{- if .Values.auth.enabled }}
+          args:
+            - "--requirepass"
+            - "$(REDIS_PASSWORD)"
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default (printf "%s-auth" (include "redis.fullname" .)) .Values.auth.existingSecret | quote }}
+                  key: redis-password
+          {{- end }}
+          ports:
+            - name: redis
+              containerPort: 6379
+          volumeMounts:
+            - name: redis-config
+              mountPath: /etc/redis
+            - name: redis-data
+              mountPath: /data
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            tcpSocket:
+              port: redis
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            tcpSocket:
+              port: redis
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: redis-config
+          configMap:
+            name: {{ include "redis.fullname" . }}-config
+            items:
+              - key: redis.conf
+                path: redis.conf
+        - name: redis-data
+          {{- if .Values.storage.useEmptyDir }}
+          emptyDir: {}
+          {{- else if .Values.storage.existingClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.storage.existingClaim }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
