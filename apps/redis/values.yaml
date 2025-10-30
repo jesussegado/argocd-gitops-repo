@@ -57,8 +57,7 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 
-nodeSelector:
-  oke.oraclecloud.com/pool.name: np-general
+nodeSelector: {}
 
 resources:
   limits:
