@@ -1,0 +1,72 @@
+{
+    "version": 1,
+    "configuration": {
+        "gitopsRepoUrl":"https://github.com/jesussegado/argocd-gitops-repo",
+        "gitopsRepoPath":"apps-demo",
+        "gitopsRepoTargetRevision":"main"
+    },
+    "defaults": {
+        "environments": {
+            "dev": {
+                "argocdServer": "https://127.0.0.1:8080"
+            },
+            "stage": {
+                "argocdServer": "https://127.0.0.1:8080"
+            },
+            "prod": {
+                "argocdServer": "https://127.0.0.1:8080"
+            }
+        },
+        "requiresBuild": false
+    },
+    "services": {
+        "redis-commander": {
+            "name": "redis-commander",
+            "repoPath": "apps/redis-commander",
+            "chartPath": "apps/redis-commander",
+            "values": {
+                "dev": "apps/redis-commander/values-dev.yaml",
+                "stage": "apps/redis-commander/values-stage.yaml",
+                "prod": "apps/redis-commander/values-prod.yaml"
+            },
+            "argocd": {
+                "appName": "redis-commander"
+            },
+            "requiresBuild": false
+        },
+        "redis": {
+            "name": "redis",
+            "repoPath": "apps/redis",
+            "chartPath": "apps/redis/templates",
+            "values": {
+                "dev": "apps/redis/values-dev.yaml",
+                "stage": "apps/redis/values-stage.yaml",
+                "prod": "apps/redis/values-prod.yaml"
+            },
+            "extraValues": {
+                "dev": [
+                    "apps/redis/extravalues/redis/values-dev.yaml"
+                ],
+                "stage": [
+                    "apps/redis/extravalues/redis/values-stage.yaml"
+                ],
+                "prod": [
+                    "apps/redis/extravalues/redis/values-prod.yaml"
+                ]
+            },
+            "argocd": {
+                "appName": "redis"
+            },
+            "requiresBuild": false
+        }
+    },
+    "projects": {
+        "test": {
+            "name": "test",
+            "microservices": [
+                "redis-commander",
+                "redis"
+            ]
+        }
+    }
+}
