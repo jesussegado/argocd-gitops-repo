@@ -1,5 +1,5 @@
 image:
-  tag: snyk-fix-08c85f17c94a7f00df6fb21e8ea1d10d
+  tag: latest
 replicaCount: 1
 
 reloader:
