@@ -1,5 +1,5 @@
 image:
-  tag: "7.0.0"
+  tag: "7.4.1"
 replicaCount: 1
 auth:
   enabled: false
